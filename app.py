@@ -1,52 +1,31 @@
-import pandas as pd
-import scipy.stats
-import streamlit as st
-import time
+def get_age_group(age):
+ 
+     """
+     Devuelve el grupo de edad basado en la edad en años dentro del intervalo 0..150
+     de lo contrario, devuelve 'desconocido'.
+     """
+ 
+     if 0 <= age <= 14:
+         return 'infancia'
+     elif 15 <= age <= 24:     
+             return 'juventud'
+     elif 25 <= age <= 64:
+             return 'adulto'
+     elif 65 <= age <= 80:
+             return 'vejez'
+     else:
+             return 'desconocido'
+ 
+def test_get_age_group():
 
-# estas son variables de estado que se conservan cuando Streamlin vuelve a ejecutar este script
-if 'experiment_no' not in st.session_state:
-    st.session_state['experiment_no'] = 0
-
-if 'df_experiment_results' not in st.session_state:
-    st.session_state['df_experiment_results'] = pd.DataFrame(columns=['no', 'iteraciones', 'media'])
-
-st.header('Lanzar una moneda')
-
-chart = st.line_chart([0.5])
-
-def toss_coin(n):
-
-    trial_outcomes = scipy.stats.bernoulli.rvs(p=0.5, size=n)
-
-    mean = None
-    outcome_no = 0
-    outcome_1_count = 0
-
-    for r in trial_outcomes:
-        outcome_no +=1
-        if r == 1:
-            outcome_1_count += 1
-        mean = outcome_1_count / outcome_no
-        chart.add_rows([mean])
-        time.sleep(0.05)
-
-    return mean
-
-number_of_trials = st.slider('¿Número de intentos?', 1, 1000, 10)
-start_button = st.button('Ejecutar')
-
-if start_button:
-    st.write(f'Experimento con {number_of_trials} intentos en curso.')
-    st.session_state['experiment_no'] += 1
-    mean = toss_coin(number_of_trials)
-    st.session_state['df_experiment_results'] = pd.concat([
-        st.session_state['df_experiment_results'],
-        pd.DataFrame(data=[[st.session_state['experiment_no'],
-                            number_of_trials,
-                            mean]],
-                     columns=['no', 'iteraciones', 'media'])
-        ],
-        axis=0)
-    st.session_state['df_experiment_results'] = st.session_state['df_experiment_results'].reset_index(drop=True)
-
-st.write(st.session_state['df_experiment_results'])
+    """prueba unitaria para get_age_group"""
+    assert get_age_group(-1) == 'desconocido'
+    assert get_age_group(0) == 'infancia'
+    assert get_age_group(14) == 'infancia'
+    assert get_age_group(15) == 'juventud'
+    assert get_age_group(24) == 'juventud'
+    assert get_age_group(25) == 'adulto'
+    assert get_age_group(64) == 'adulto'
+    assert get_age_group(65) == 'vejez'
+    assert get_age_group(80) == 'vejez'
+    assert get_age_group(150) == 'desconocido'
